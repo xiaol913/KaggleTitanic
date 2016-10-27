@@ -1,5 +1,6 @@
 # KaggleTitanic
 
+76.555% Categorization Accuracy
 
 Need install Python2.7. And Python need include Sklearn and Numpy.
 
