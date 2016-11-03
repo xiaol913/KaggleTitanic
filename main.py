@@ -18,10 +18,10 @@ def fix_missing_ages(df):
 
     df['Child'] = 0
     df.loc[df.Age <= 12, 'Child'] = 1
-    # df['Sex_male'] = 0
-    # df['Sex_female'] = 0
-    # df.loc[df.Sex == 0, 'Sex_female'] = 1
-    # df.loc[df.Sex == 1, 'Sex_male'] = 1
+    df['Sex_male'] = 0
+    df['Sex_female'] = 0
+    df.loc[df.Sex == 0, 'Sex_female'] = 1
+    df.loc[df.Sex == 1, 'Sex_male'] = 1
     return df
 
 
@@ -32,15 +32,16 @@ def set_embarked_type(df):
     df.loc[df.Embarked == 'C', 'Embarked_C'] = 1
     df.loc[df.Embarked == 'S', 'Embarked_S'] = 1
     df.loc[df.Embarked == 'Q', 'Embarked_Q'] = 1
+    return df
 
 
-# def set_pclass_type(df):
-#     df['Pclass_1'] = 0
-#     df['Pclass_2'] = 0
-#     df['Pclass_3'] = 0
-#     df.loc[df.Pclass == 1, 'Pclass_1'] = 1
-#     df.loc[df.Pclass == 2, 'Pclass_2'] = 1
-#     df.loc[df.Pclass == 3, 'Pclass_3'] = 1
+def set_pclass_type(df):
+    df['Pclass_1'] = 0
+    df['Pclass_2'] = 0
+    df['Pclass_3'] = 0
+    df.loc[df.Pclass == 1, 'Pclass_1'] = 1
+    df.loc[df.Pclass == 2, 'Pclass_2'] = 1
+    df.loc[df.Pclass == 3, 'Pclass_3'] = 1
 
 
 def set_cabin_type(df):
@@ -119,7 +120,8 @@ def scale_age_fare(df):
 
 def set_family_and_others(df):
     df['FamilySize'] = df['SibSp'] + df['Parch']
-    df['Age*Class'] = df.AgeFill * df.Pclass
+    df['Age*Class'] = df.Age * df.Pclass
+    return df
 
 
 
@@ -129,7 +131,8 @@ def main(df):
     set_cabin_type(df)
     scale_age_fare(df)
     set_family_and_others(df)
-    # set_pclass_type(df)
+    set_pclass_type(df)
+    return df
 
 
 def train_test(train, test):
@@ -139,7 +142,7 @@ def train_test(train, test):
     # Train Data processing
     main(df)
     # Set Train Data feature
-    train_df = df.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex|Pclass|FamilySize|Child|Age*Class')
+    train_df = df.filter(regex='Survived|Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*|FamilySize|Child|Age*Class')
     train_np = train_df.values
     y = train_np[:, 0]
     x = train_np[:, 1:]
@@ -148,10 +151,11 @@ def train_test(train, test):
     # Test Data processing
     main(data_test)
     # Set Test Data feature
-    test = data_test.filter(regex='Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex|Pclass|FamilySize|Child|Age*Class')
+    test = data_test.filter(regex='Age_.*|SibSp|Parch|Fare_.*|Cabin_.*|Embarked_.*|Sex_.*|Pclass_.*|FamilySize|Child|Age*Class')
     predictions = clf.predict(test)
     result = pd.DataFrame({'PassengerId': data_test['PassengerId'].as_matrix(), 'Survived': predictions.astype(np.int32)})
     result.to_csv('result.csv', index=False)
+
 
 
 # train = 'train.csv'
